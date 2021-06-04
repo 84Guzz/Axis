@@ -102,6 +102,7 @@ private:
 	bool _cmdMoveA = false;
 	bool _cmdMoveB = false;
 	bool _cmdStop = false;
+	bool _quickStop = false;
 
 	//Setpoints
 	long _target = 0;
