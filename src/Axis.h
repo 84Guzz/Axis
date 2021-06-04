@@ -53,7 +53,6 @@ public:
 	//Getters
 	bool getInA();
 	bool getInB();
-	bool getPWM();
 	uint8_t getSpeed();
 	uint8_t getState();
 	long getPosition();
