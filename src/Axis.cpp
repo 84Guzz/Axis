@@ -143,7 +143,7 @@ void Axis::_update(){
     if(_state == AXIS_CONSTANT_VELOCITY && _stateTimer >= _cvTime) _nextState = AXIS_DECELERATING;
     if(_state == AXIS_DECELERATING && _stateTimer >= _decTime) _nextState = AXIS_ON_POS;
     if((_state >= AXIS_ACCELERATING && _state <= AXIS_DECELERATING) && (_limitSwA || _limitSwB)) _nextState = AXIS_QUICK_STOP;
-    if((_state >= AXIS_ACCELERATING && _state <= AXIS_DECELERATING || _state == AXIS_HOMING) && _quickStop) _nextState = AXIS_QUICK_STOP;
+    if(((_state >= AXIS_ACCELERATING && _state <= AXIS_DECELERATING) || _state == AXIS_HOMING) && _quickStop) _nextState = AXIS_QUICK_STOP;
 
 	//State machine
 	_state = _nextState;
