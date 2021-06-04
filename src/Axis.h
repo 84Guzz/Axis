@@ -44,6 +44,7 @@ public:
 	void home(unsigned long Speed, bool Direction = false);
 	void moveAbs(long Target);
 	void moveRel(long Distance);
+	void quickStop();
 	
 	//Update
 	void update();
