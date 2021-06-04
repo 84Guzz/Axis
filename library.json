@@ -1,0 +1,20 @@
+
+{
+	"name": "Axis",
+	"version": "1.0.0",
+	"keywords": "motion",
+	"description": "Open loop position control, closed loop tbd.",
+	"authors":
+	[
+		{
+		"name": "Guus van der Sluijs",
+		"email": "guus@guusvandersluijs.com"
+		}
+	],
+	"repository":
+	{
+		"type": "git",
+		"url": "https://github.com/84Guzz/Axis.git"
+	},
+	"frameworks": "arduino"
+}
