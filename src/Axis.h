@@ -51,6 +51,9 @@ public:
 	void update(bool limitSwA, bool limitSwB);
 
 	//Getters
+	bool getInA();
+	bool getInB();
+	bool getPWM();
 	uint8_t getSpeed();
 	uint8_t getState();
 	long getPosition();
