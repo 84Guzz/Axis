@@ -288,6 +288,24 @@ void Axis::_update(){
 
 }
 
+bool Axis::getInA(){
+	
+	return _motor.getInA();
+	
+}
+
+bool Axis::getInB(){
+	
+	return _motor.getInB();
+	
+}
+
+uint8_t Axis::getSpeed(){
+
+	return _motor.getSpeed();
+
+}
+
 uint8_t Axis::getState(){
 
 	return _state;
