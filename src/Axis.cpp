@@ -107,6 +107,12 @@ void Axis::moveRel(long Distance){
 
 }
 
+void Axis::quickStop(){
+	
+	_quickStop = true;
+	
+}
+
 void Axis::update(){
 
     _update();
@@ -136,7 +142,8 @@ void Axis::_update(){
     if(_state == AXIS_ACCELERATING && _stateTimer >= _accTime && _cvTime == 0) _nextState = AXIS_DECELERATING;
     if(_state == AXIS_CONSTANT_VELOCITY && _stateTimer >= _cvTime) _nextState = AXIS_DECELERATING;
     if(_state == AXIS_DECELERATING && _stateTimer >= _decTime) _nextState = AXIS_ON_POS;
-    if((_state >= AXIS_ACCELERATING && _state <= AXIS_DECELERATING) && (_limitSwA || _limitSwB)) _nextState = AXIS_QUICK_STOP;   
+    if((_state >= AXIS_ACCELERATING && _state <= AXIS_DECELERATING) && (_limitSwA || _limitSwB)) _nextState = AXIS_QUICK_STOP;
+    if((_state >= AXIS_ACCELERATING && _state <= AXIS_DECELERATING || _state == AXIS_HOMING) && _quickStop) _nextState = AXIS_QUICK_STOP;
 
 	//State machine
 	_state = _nextState;
@@ -259,12 +266,15 @@ void Axis::_update(){
         if (_newState){
 
             //Set position to limit
-            if (_limitSwA && _cmdMoveA && _limitA != 2147483647) _position = _limitA;
-            if (_limitSwB && _cmdMoveB && _limitB != -2147483648) _position = _limitB;
+	    if (!_quickStop){		
+		if (_limitSwA && _cmdMoveA && _limitA != 2147483647) _position = _limitA;
+            	if (_limitSwB && _cmdMoveB && _limitB != -2147483648) _position = _limitB;
+	    }
 
             //Reset commands
             _cmdMoveA = false;
             _cmdMoveB = false;
+	    _quickStop = false;
 
             //Stop motor
             _motor.cmdStop(0);
@@ -287,6 +297,10 @@ uint8_t Axis::getState(){
 long Axis::getPosition(){
 
     return _position / 1000;
+}
+
+bool Axis::moving(){
+    return _state == AXIS_IDLE || _state == AXIS_ON_POS;
 }
 
 void Axis::_calculateProfile(){
