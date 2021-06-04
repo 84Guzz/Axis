@@ -54,6 +54,7 @@ public:
 	uint8_t getState();
 	long getPosition();
 	bool positionWithinMargin();
+	bool moving();
 
 private:
 	//DC Motor
