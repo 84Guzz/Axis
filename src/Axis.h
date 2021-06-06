@@ -40,6 +40,7 @@ public:
 	void begin(AxisParam  parameters);
 	
 	//Commands
+	void enabled(bool Enable = false);
 	void home(bool Direction = false);
 	void home(unsigned long Speed, bool Direction = false);
 	void moveAbs(long Target);
@@ -72,6 +73,8 @@ private:
 	elapsedMillis _stateTimer = 0;
 
 	//Process values
+	bool _enabled;
+	bool _moving;
 	void _calculateProfile();
 	void _update();
 	long _startPosition = 0;
