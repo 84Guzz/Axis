@@ -58,58 +58,77 @@ void Axis::begin(AxisParam parameters){
 
 }
 
-void Axis::home(bool Direction = false){
+void Axis::enabled(bool Enable){
 
-    _cmdHomeA = Direction;
-    _cmdHomeB = !Direction;
-
+    _enabled = Enable;
 }
 
-void Axis::home(unsigned long Speed, bool Direction = false){
+void Axis::home(bool Direction){
 
-    _homeSpeed = Speed;
+    if (!_moving){
 
-    _cmdHomeA = Direction;
-    _cmdHomeB = !Direction;
+        _cmdHomeA = Direction;
+        _cmdHomeB = !Direction;
 
+    }
+}
+
+void Axis::home(unsigned long Speed, bool Direction){
+
+    if (!_moving && _enabled){
+
+        _homeSpeed = Speed;
+
+        _cmdHomeA = Direction;
+        _cmdHomeB = !Direction;
+
+    }
 
 }
 
 void Axis::moveAbs(long Target){
 
-    //Set target position
-    _target = Target * 1000;
+    if (!_moving && _enabled){
 
-    //Calculate profile
-    _calculateProfile();
+        //Set target position
+        _target = Target * 1000;
 
-    //Set commands
-    if (_accTime > 0 && _decTime > 0) {
-        _cmdMoveA = _distance > 0;
-        _cmdMoveB = _distance < 0;
+        //Calculate profile
+        _calculateProfile();
+
+        //Set commands
+        if (_accTime > 0 && _decTime > 0) {
+            _cmdMoveA = _distance > 0;
+            _cmdMoveB = _distance < 0;
+        }
+
     }
     
 }
 
 void Axis::moveRel(long Distance){
 
-    //Calculate target position
-    _target = _position + (Distance * 1000);
+    if (!_moving && _enabled){
 
-    //Calculate profile
-    _calculateProfile();
+        //Calculate target position
+        _target = _position + (Distance * 1000);
 
-    //Set commands
-    if (_accTime > 0 && _decTime > 0) {
-        _cmdMoveA = _distance > 0;
-        _cmdMoveB = _distance < 0;
+        //Calculate profile
+        _calculateProfile();
+
+        //Set commands
+        if (_accTime > 0 && _decTime > 0) {
+            _cmdMoveA = _distance > 0;
+            _cmdMoveB = _distance < 0;
+        }
+
     }    
 
 }
 
 void Axis::quickStop(){
 	
-	_quickStop = true;
+	if (_moving) _quickStop = true;
 	
 }
 
@@ -143,7 +162,8 @@ void Axis::_update(){
     if(_state == AXIS_CONSTANT_VELOCITY && _stateTimer >= _cvTime) _nextState = AXIS_DECELERATING;
     if(_state == AXIS_DECELERATING && _stateTimer >= _decTime) _nextState = AXIS_ON_POS;
     if((_state >= AXIS_ACCELERATING && _state <= AXIS_DECELERATING) && (_limitSwA || _limitSwB)) _nextState = AXIS_QUICK_STOP;
-    if(((_state >= AXIS_ACCELERATING && _state <= AXIS_DECELERATING) || _state == AXIS_HOMING) && _quickStop) _nextState = AXIS_QUICK_STOP;
+    if(((_state >= AXIS_ACCELERATING && _state <= AXIS_DECELERATING) || _state == AXIS_HOMING) && !_enabled) _nextState = AXIS_QUICK_STOP;
+    if(_state == AXIS_QUICK_STOP && _motor.getSpeed() == 0) _nextState = AXIS_IDLE;
 
 	//State machine
 	_state = _nextState;
@@ -283,6 +303,9 @@ void Axis::_update(){
 
     }
 
+    //Set moving status
+    _moving = (!(_state == AXIS_IDLE || _state == AXIS_ON_POS));
+
 	//Save previous state
 	_prevState = _state;
 
@@ -318,7 +341,7 @@ long Axis::getPosition(){
 }
 
 bool Axis::moving(){
-    return _state == AXIS_IDLE || _state == AXIS_ON_POS;
+    return _moving;
 }
 
 void Axis::_calculateProfile(){
